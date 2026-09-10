@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Navbar({ targetRole, onRunAnalysis, onDemoMode, isAnalyzing }) {
+export default function Navbar({ targetRole, onRunAnalysis, onDemoMode, isAnalyzing, isDemo }) {
   return (
     <header className="app-header" id="main-nav">
       <div className="nav-container">
@@ -15,20 +15,39 @@ export default function Navbar({ targetRole, onRunAnalysis, onDemoMode, isAnalyz
             </svg>
           </div>
           <span className="brand-title">RESUME<span className="brand-accent">INTEL</span></span>
-          <span className="brand-badge">REACT STUDIO</span>
+          <span className="brand-badge">STUDIO</span>
         </div>
 
         <div className="nav-status">
           <span className="status-indicator" />
-          <span className="status-text">{targetRole ? `Target: ${targetRole}` : 'Target: Software Development Engineer'}</span>
+          <span className={`status-text ${!targetRole ? 'faint' : ''}`}>
+            {targetRole ? `Target: ${targetRole}${isDemo ? ' (Demo)' : ''}` : 'No Role Configured'}
+          </span>
         </div>
 
         <div className="nav-actions">
-          <button type="button" className="btn btn-secondary btn-sm" onClick={onDemoMode} title="Load sample candidates">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-            Demo Mode
+          <button 
+            type="button" 
+            className={`btn btn-secondary btn-sm ${isDemo ? 'btn-active' : ''}`} 
+            onClick={onDemoMode} 
+            title={isDemo ? 'Exit demo mode and clear' : 'Load sample candidates for preview'}
+          >
+            {isDemo ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                Exit Demo
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                Demo Mode
+              </>
+            )}
           </button>
           <button 
             type="button" 

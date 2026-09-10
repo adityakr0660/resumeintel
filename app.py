@@ -56,26 +56,24 @@ def save_cache():
 
 load_cache()
 
-active_job_text = core_analyzer.job_description.strip()
+active_job_text = ""
 active_job_parsed = None
 
 def get_or_parse_active_job():
     global active_job_parsed
+    if not active_job_text or not active_job_text.strip():
+        return None
     if active_job_parsed is None:
         try:
             active_job_parsed = core_analyzer.parse_job_description(active_job_text)
         except Exception as e:
             active_job_parsed = core_analyzer.JobD(
-                role="Software Development Engineer (SDE-I)",
-                required_skills=["Java", "Python", "C++", "Data Structures", "Algorithms", "Object-Oriented Design"],
-                preferred_skills=["AWS", "Cloud Architecture", "Distributed Systems", "SQL/NoSQL", "GenAI Tools", "CI/CD"],
+                role="Custom Technical Role",
+                required_skills=["Core Engineering", "Problem Solving"],
+                preferred_skills=["Cloud", "Modern Frameworks"],
                 minimum_experience=1.0,
-                education_requirements=["Bachelor's degree in Computer Science or STEM"],
-                responsibilities=[
-                    "Design and operate innovative cloud microservices at scale",
-                    "Collaborate with cross-disciplinary teams in an agile environment",
-                    "Write clean, resilient code and participate in peer code reviews"
-                ]
+                education_requirements=["Relevant STEM Degree"],
+                responsibilities=["Deliver resilient software solutions"]
             )
     return active_job_parsed
 
@@ -115,10 +113,15 @@ async def serve_index():
 
 @app.get("/api/job")
 async def get_job():
+    if not active_job_text.strip():
+        return {
+            "text": "",
+            "structured": None
+        }
     job_obj = get_or_parse_active_job()
     return {
         "text": active_job_text,
-        "structured": job_obj.model_dump()
+        "structured": job_obj.model_dump() if job_obj else None
     }
 
 
@@ -127,7 +130,11 @@ async def update_and_parse_job(payload: dict = Body(...)):
     global active_job_text, active_job_parsed, analysis_cache
     new_text = payload.get("job_description", "").strip()
     if not new_text:
-        raise HTTPException(status_code=400, detail="Job description text cannot be empty.")
+        active_job_text = ""
+        active_job_parsed = None
+        analysis_cache = {}
+        save_cache()
+        return {"text": "", "structured": None}
     
     active_job_text = new_text
     try:
@@ -172,16 +179,19 @@ async def upload_resume(file: UploadFile = File(...)):
     with open(save_path, "wb") as f:
         f.write(content)
     
-    # Automatically evaluate the newly uploaded resume
+    # Automatically evaluate the newly uploaded resume if job is set
     eval_result = None
     eval_error = None
-    try:
-        job_obj = get_or_parse_active_job()
-        eval_result = evaluate_single_file(save_path, job_obj)
-        analysis_cache[file.filename] = eval_result
-        save_cache()
-    except Exception as e:
-        eval_error = str(e)
+    job_obj = get_or_parse_active_job()
+    if job_obj:
+        try:
+            eval_result = evaluate_single_file(save_path, job_obj)
+            analysis_cache[file.filename] = eval_result
+            save_cache()
+        except Exception as e:
+            eval_error = str(e)
+    else:
+        eval_error = "Job description not set yet. Uploaded to vault, ready for evaluation once criteria is defined."
         
     return {
         "message": f"Successfully uploaded {file.filename}",
@@ -221,8 +231,11 @@ async def get_current_results():
 
 @app.post("/api/analyze")
 async def run_analysis(payload: dict = Body(default={})):
-    requested_files = payload.get("filenames", [])
     job_obj = get_or_parse_active_job()
+    if not job_obj:
+        raise HTTPException(status_code=400, detail="Please provide a job description first before running evaluation.")
+
+    requested_files = payload.get("filenames", [])
     
     target_files = []
     if requested_files:
@@ -266,7 +279,22 @@ async def run_analysis(payload: dict = Body(default={})):
 
 @app.get("/api/demo-data")
 async def get_demo_data():
-    job_obj = get_or_parse_active_job()
+    demo_job_text = core_analyzer.job_description.strip()
+    try:
+        demo_job_obj = core_analyzer.parse_job_description(demo_job_text)
+    except Exception:
+        demo_job_obj = core_analyzer.JobD(
+            role="Software Development Engineer (SDE-I)",
+            required_skills=["Java", "Python", "C++", "Data Structures", "Algorithms", "Object-Oriented Design"],
+            preferred_skills=["AWS", "Cloud Architecture", "Distributed Systems", "SQL/NoSQL", "GenAI Tools", "CI/CD"],
+            minimum_experience=1.0,
+            education_requirements=["Bachelor's degree in Computer Science or STEM"],
+            responsibilities=[
+                "Design and operate innovative cloud microservices at scale",
+                "Collaborate with cross-disciplinary teams in an agile environment",
+                "Write clean, resilient code and participate in peer code reviews"
+            ]
+        )
     demo_results = [
         {
             "filename": "Ashish Raj 24PCS007 (1) - Ashish Raj.pdf",
@@ -392,9 +420,28 @@ async def get_demo_data():
     return {
         "results": demo_results,
         "total_analyzed": len(demo_results),
-        "job_role": job_obj.role,
+        "job_text": demo_job_text,
+        "job_role": demo_job_obj.role,
+        "job_structured": demo_job_obj.model_dump(),
         "is_demo": True
     }
+
+
+@app.post("/api/reset")
+async def reset_workspace():
+    global active_job_text, active_job_parsed, analysis_cache
+    active_job_text = ""
+    active_job_parsed = None
+    analysis_cache = {}
+    save_cache()
+    # Delete uploaded resumes, keep .gitkeep
+    for p in RESUMES_DIR.iterdir():
+        if p.name != ".gitkeep" and p.is_file():
+            try:
+                p.unlink()
+            except Exception:
+                pass
+    return {"message": "Workspace reset successfully to clean state."}
 
 
 if __name__ == "__main__":

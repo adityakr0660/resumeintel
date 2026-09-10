@@ -33,7 +33,7 @@
 
       <div class="nav-status">
         <span class="status-indicator"></span>
-        <span class="status-text" id="active-role-pill">Target: Amazon SDE-I</span>
+        <span class="status-text" id="active-role-pill">No Role Configured</span>
       </div>
 
       <div class="nav-actions">
@@ -81,7 +81,7 @@
             </button>
           </div>
           <div class="hero-metrics">
-            <span class="metric-item"><strong id="vault-count-stat">4</strong> Resumes in Vault</span>
+            <span class="metric-item"><strong id="vault-count-stat">0</strong> Resumes in Vault</span>
             <span class="metric-divider">/</span>
             <span class="metric-item">Pydantic Validation</span>
             <span class="metric-divider">/</span>
@@ -116,53 +116,38 @@
         <div class="studio-card jd-panel">
           <div class="card-header">
             <div class="card-title-wrap">
-              <h3 class="card-title" id="job-role-display">Role Criteria</h3>
-              <span class="badge" id="job-exp-display">Min Exp: 1.0 yr</span>
+              <h3 class="card-title" id="job-role-display">Role Criteria (Not Set)</h3>
+              <span class="badge" id="job-exp-display">Min Exp: --</span>
             </div>
-            <button type="button" class="btn-text" id="toggle-jd-edit-btn">Edit Job Description</button>
+            <button type="button" class="btn-text" id="toggle-jd-edit-btn">+ Add Job Description</button>
           </div>
 
-          <!-- Structured Criteria Tags -->
+          <!-- Structured Criteria Tags or Empty Box -->
           <div class="criteria-view" id="criteria-view">
-            <div class="criteria-group">
-              <div class="group-label">Required Skills</div>
-              <div class="tags-cluster" id="required-skills-tags">
-                <span class="tag tag-primary">Java</span>
-                <span class="tag tag-primary">Python</span>
-                <span class="tag tag-primary">C++</span>
-                <span class="tag tag-primary">Data Structures</span>
-                <span class="tag tag-primary">Algorithms</span>
-                <span class="tag tag-primary">Object-Oriented Design</span>
+            <div class="criteria-empty-box">
+              <div class="empty-icon-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
               </div>
-            </div>
-
-            <div class="criteria-group">
-              <div class="group-label">Preferred Skills</div>
-              <div class="tags-cluster" id="preferred-skills-tags">
-                <span class="tag tag-muted">AWS</span>
-                <span class="tag tag-muted">Cloud Architecture</span>
-                <span class="tag tag-muted">Distributed Systems</span>
-                <span class="tag tag-muted">SQL/NoSQL</span>
-                <span class="tag tag-muted">GenAI Tools</span>
-                <span class="tag tag-muted">CI/CD</span>
+              <div class="empty-text">
+                <strong>Define Target Criteria</strong>
+                <p>Paste a job description so Groq AI can extract required skills, experience levels, and qualifications.</p>
               </div>
-            </div>
-
-            <div class="criteria-group">
-              <div class="group-label">Education Requirements</div>
-              <ul class="criteria-list" id="education-requirements-list">
-                <li>Bachelor's degree in Computer Science or STEM</li>
-              </ul>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-open-jd-drawer">+ Add Job Description</button>
             </div>
           </div>
 
           <!-- Collapsible JD Textarea Editor -->
           <div class="jd-editor-drawer hidden" id="jd-editor-drawer">
             <label for="jd-textarea" class="editor-label">Paste or modify raw job description text:</label>
-            <textarea id="jd-textarea" class="jd-input" rows="8" placeholder="Paste target job description here..."></textarea>
+            <textarea id="jd-textarea" class="jd-input" rows="8" placeholder="Paste target job description here (e.g. Job Role, Responsibilities, Required Skills, Minimum Experience)..."></textarea>
             <div class="editor-actions">
               <button type="button" class="btn btn-secondary btn-sm" id="cancel-jd-btn">Cancel</button>
-              <button type="button" class="btn btn-primary btn-sm" id="save-jd-btn">Update & Re-Extract</button>
+              <button type="button" class="btn btn-primary btn-sm" id="save-jd-btn">Save & Extract Criteria</button>
             </div>
           </div>
         </div>
@@ -172,7 +157,7 @@
           <div class="card-header">
             <div class="card-title-wrap">
               <h3 class="card-title">Candidate Vault</h3>
-              <span class="badge" id="vault-badge-count">4 Resumes</span>
+              <span class="badge" id="vault-badge-count">0 Resumes</span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <button type="button" class="btn btn-secondary btn-sm" id="vault-upload-btn">+ Upload</button>

@@ -26,6 +26,7 @@ export default function App() {
   const [progressStep, setProgressStep] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isUpdatingCriteria, setIsUpdatingCriteria] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
 
   // Inspector Drawer State
   const [inspectedCandidate, setInspectedCandidate] = useState(null);
@@ -55,20 +56,13 @@ export default function App() {
           getResumes().catch(() => ({ resumes: [] })),
         ]);
 
-        if (job) setJobData(job);
+        if (job && job.text) setJobData(job);
         if (resumeList) setResumes(resumeList.resumes || []);
 
-        // Load evaluated results from server cache
+        // Load evaluated results from server cache if any
         const evalRes = await getEvaluatedResults().catch(() => ({ results: [] }));
         if (evalRes.results && evalRes.results.length > 0) {
           setResults(evalRes.results);
-        } else if (resumeList.resumes && resumeList.resumes.length > 0) {
-          // Vault has resumes ready, run analysis
-          triggerAnalysis();
-        } else {
-          // Default fallback demo data
-          const demo = await getDemoData().catch(() => ({ results: [] }));
-          if (demo.results) setResults(demo.results);
         }
       } catch (err) {
         addToast('Initial data synchronization error', 'error');
@@ -80,6 +74,18 @@ export default function App() {
   // Run Analysis
   const triggerAnalysis = async () => {
     if (isAnalyzing) return;
+
+    if (!jobData || !jobData.text || !jobData.text.trim()) {
+      addToast('Please add a Job Description first so resumes can be scored accurately.', 'error');
+      return;
+    }
+
+    if (resumes.length === 0) {
+      addToast('Please upload at least one resume (PDF/DOCX) in the vault to evaluate.', 'error');
+      handleUploadShortcut();
+      return;
+    }
+
     setIsAnalyzing(true);
     setProgressStep(20);
 
@@ -92,6 +98,7 @@ export default function App() {
       clearInterval(progressTimer);
       setProgressStep(100);
 
+      setIsDemo(false);
       if (data.results) {
         setResults(data.results);
         addToast(`Evaluated ${data.results.length} candidate resumes successfully.`, 'success');
@@ -127,9 +134,13 @@ export default function App() {
       }
 
       try {
-        addToast(`Analyzing ${file.name} with Groq AI...`, 'normal');
+        addToast(`Uploading ${file.name}...`, 'normal');
         const data = await uploadResumeFile(file);
         if (data.candidate) {
+          if (isDemo) {
+            setIsDemo(false);
+            setResults([]);
+          }
           setResults((prev) => {
             const next = prev.filter((r) => r.filename !== file.name);
             next.unshift(data.candidate);
@@ -137,7 +148,7 @@ export default function App() {
           });
           addToast(`Evaluated ${data.candidate.name || file.name}! Match: ${data.candidate.score}%`, 'success');
         } else {
-          addToast(`Uploaded ${file.name}`, 'success');
+          addToast(`Uploaded ${file.name} to vault.`, 'success');
         }
       } catch (err) {
         addToast(`Upload failed for ${file.name}: ${err.message}`, 'error');
@@ -174,7 +185,11 @@ export default function App() {
     try {
       const data = await updateJobCriteria(text);
       setJobData(data);
-      addToast('Updated role specifications extracted successfully.', 'success');
+      setIsDemo(false);
+      addToast('Role specifications extracted successfully with Groq AI!', 'success');
+      if (resumes.length > 0) {
+        addToast('Click "Run Analysis" to score vault resumes against this role.', 'normal');
+      }
     } catch (err) {
       addToast(`Update criteria error: ${err.message}`, 'error');
     } finally {
@@ -182,13 +197,29 @@ export default function App() {
     }
   };
 
-  // Demo Mode
+  // Demo Mode Toggle
   const handleDemoMode = async () => {
+    if (isDemo) {
+      setIsDemo(false);
+      setResults([]);
+      setJobData(null);
+      addToast('Exited demo mode. Workspace is clean and ready.', 'normal');
+      return;
+    }
+
     try {
+      addToast('Loading demo dataset...', 'normal');
       const data = await getDemoData();
       if (data.results) {
+        setIsDemo(true);
         setResults(data.results);
-        addToast('Switched to pre-computed demo evaluation data.', 'normal');
+        if (data.job_text) {
+          setJobData({
+            text: data.job_text,
+            structured: data.job_structured
+          });
+        }
+        addToast('Loaded demo mode: Amazon SDE-I role & 4 candidate evaluations.', 'success');
       }
     } catch (err) {
       addToast('Could not load demo data.', 'error');
@@ -199,7 +230,7 @@ export default function App() {
   const handleUploadShortcut = () => {
     const el = document.getElementById('upload-dropzone');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
-    const input = document.getElementById('resume-file-input');
+    const input = document.getElementById('resume-file-input') || document.getElementById('file-input');
     if (input) input.click();
   };
 
@@ -210,6 +241,7 @@ export default function App() {
         onRunAnalysis={triggerAnalysis}
         onDemoMode={handleDemoMode}
         isAnalyzing={isAnalyzing}
+        isDemo={isDemo}
       />
 
       <main className="app-main">
@@ -258,6 +290,9 @@ export default function App() {
             setInspectedCandidate(candidate);
             setInspectedRank(rank);
           }}
+          onTryDemo={handleDemoMode}
+          onUploadShortcut={handleUploadShortcut}
+          isDemo={isDemo}
         />
       </main>
 
