@@ -47,29 +47,35 @@ export default function App() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Initial Load
+  // Initial Load (Auto-clears all cache and state on fresh load / refresh)
   useEffect(() => {
-    async function loadData() {
+    async function initFresh() {
       try {
-        const [job, resumeList] = await Promise.all([
-          getJobCriteria().catch(() => null),
-          getResumes().catch(() => ({ resumes: [] })),
-        ]);
-
-        if (job && job.text) setJobData(job);
-        if (resumeList) setResumes(resumeList.resumes || []);
-
-        // Load evaluated results from server cache if any
-        const evalRes = await getEvaluatedResults().catch(() => ({ results: [] }));
-        if (evalRes.results && evalRes.results.length > 0) {
-          setResults(evalRes.results);
-        }
-      } catch (err) {
-        addToast('Initial data synchronization error', 'error');
+        await fetch('/api/reset', { method: 'POST' });
+      } catch (e) {
+        console.warn('Could not reset on init:', e);
       }
+      setJobData(null);
+      setResumes([]);
+      setResults([]);
+      setIsDemo(false);
     }
-    loadData();
-  }, [addToast]);
+    initFresh();
+  }, []);
+
+  // Manual Reset Workspace
+  const handleResetWorkspace = async () => {
+    try {
+      await fetch('/api/reset', { method: 'POST' });
+      setJobData(null);
+      setResumes([]);
+      setResults([]);
+      setIsDemo(false);
+      addToast('All cache, job description, and uploaded resumes cleared!', 'success');
+    } catch (err) {
+      addToast('Failed to reset workspace.', 'error');
+    }
+  };
 
   // Run Analysis
   const triggerAnalysis = async () => {
@@ -240,6 +246,7 @@ export default function App() {
         targetRole={jobData?.structured?.role}
         onRunAnalysis={triggerAnalysis}
         onDemoMode={handleDemoMode}
+        onResetWorkspace={handleResetWorkspace}
         isAnalyzing={isAnalyzing}
         isDemo={isDemo}
       />

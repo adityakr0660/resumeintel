@@ -32,6 +32,7 @@
   // DOM Elements
   const els = {
     activeRolePill: document.getElementById('active-role-pill'),
+    navResetBtn: document.getElementById('nav-reset-btn'),
     navDemoBtn: document.getElementById('nav-demo-btn'),
     navRunBtn: document.getElementById('nav-run-btn'),
     heroRunBtn: document.getElementById('hero-run-btn'),
@@ -94,25 +95,23 @@
     }, 3200);
   }
 
-  // Load Initial Data
+  // Load Initial Data (Auto-clears all cache and state on fresh load / refresh)
   async function init() {
+    try {
+      await fetch('/api/reset', { method: 'POST' });
+    } catch (e) {
+      console.warn('Could not reset on init:', e);
+    }
+
+    state.job = null;
+    state.resumes = [];
+    state.results = [];
+    state.isDemo = false;
+
     await fetchJobCriteria();
     await fetchResumesList();
 
-    // Check if server already has evaluated candidates in cache
-    try {
-      const res = await fetch('/api/results');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.results && data.results.length > 0) {
-          state.results = data.results;
-        }
-      }
-    } catch (e) {
-      console.warn('Could not fetch cached results:', e);
-    }
-
-    // Always render Bento Grid (shows clean empty state by default)
+    // Render clean empty state by default
     renderBentoGrid();
     setupEventListeners();
   }
@@ -773,6 +772,31 @@
     els.heroRunBtn.addEventListener('click', runLiveAnalysis);
 
     els.navDemoBtn.addEventListener('click', toggleDemoMode);
+
+    if (els.navResetBtn) {
+      els.navResetBtn.addEventListener('click', async () => {
+        try {
+          await fetch('/api/reset', { method: 'POST' });
+          state.isDemo = false;
+          state.results = [];
+          state.resumes = [];
+          state.job = null;
+          renderJobCriteria(null);
+          renderVaultList([]);
+          renderBentoGrid();
+          els.navDemoBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Demo Mode
+          `;
+          els.navDemoBtn.classList.remove('btn-active');
+          showToast('All cache, job description, and uploaded resumes cleared!', 'success');
+        } catch (err) {
+          showToast('Failed to reset workspace.', 'error');
+        }
+      });
+    }
 
     els.heroUploadShortcut.addEventListener('click', () => {
       els.uploadDropzone.scrollIntoView({ behavior: 'smooth' });

@@ -108,7 +108,11 @@ async def serve_index():
     index_file = TEMPLATES_DIR / "index.html"
     if not index_file.exists():
         return HTMLResponse("<h1>Loading Resume Intelligence Studio...</h1>")
-    return HTMLResponse(index_file.read_text(encoding="utf-8"))
+    resp = HTMLResponse(index_file.read_text(encoding="utf-8"))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 
 @app.get("/api/job")
@@ -427,7 +431,7 @@ async def get_demo_data():
     }
 
 
-@app.post("/api/reset")
+@app.api_route("/api/reset", methods=["GET", "POST"])
 async def reset_workspace():
     global active_job_text, active_job_parsed, analysis_cache
     active_job_text = ""
@@ -439,9 +443,9 @@ async def reset_workspace():
         if p.name != ".gitkeep" and p.is_file():
             try:
                 p.unlink()
-            except Exception:
-                pass
-    return {"message": "Workspace reset successfully to clean state."}
+            except Exception as e:
+                print(f"Error removing {p}: {e}")
+    return {"message": "All cache, job description, and uploaded resumes have been cleared successfully."}
 
 
 if __name__ == "__main__":
