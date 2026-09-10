@@ -1,12 +1,17 @@
 # 🎯 Resume Intelligence Studio (AI-Powered Talent Screener)
 
-> **Precision resume screening and technical candidate evaluation powered by Groq LLM and structured Pydantic schemas.**
+> **Precision resume screening and technical candidate evaluation powered by Groq LLM (Llama 3.3 70B) and structured Pydantic schemas.**
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-10b981?style=for-the-badge&logo=render)](https://resumeintel-3wdj.onrender.com/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/adityakr0660/resumeintel)
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite)
 ![Groq](https://img.shields.io/badge/LLM-Groq%20Llama%203.3%2070B-f55036)
+
+🌐 **Live Deployment**: [resumeintel-3wdj.onrender.com](https://resumeintel-3wdj.onrender.com/)
 
 ---
 
@@ -27,11 +32,12 @@ Instead of unstructured text answers, the system enforces **structured Pydantic 
   - Radial score percentage gauge.
   - Verified matching skills vs missing/growth skills.
   - Recruiter verdict quote and experience verification.
+- **Clean Slate on Refresh**: State, uploaded resumes, and cached evaluations auto-wipe on page refresh so candidates can be evaluated fresh each session.
 - **High-Aesthetic Dark UI**: Designed with a **Modern Linear / Vercel Dark Tech** aesthetic:
   - Deep obsidian base (`#08080a`) with glowing emerald accents (`#10b981`).
   - Slide-over candidate inspector drawer.
   - Drag-and-drop vault with auto-evaluation.
-- **Fast Local Cache**: Evaluated resumes are cached locally in `analysis_cache.json` to prevent duplicate LLM calls and conserve API tokens.
+- **Interactive Demo Mode**: One-click preview with Amazon SDE-I role and 4 sample candidate evaluations.
 
 ---
 
@@ -66,7 +72,7 @@ User uploads Resume (.pdf / .docx)
      [ Local Cache Store ]
                │
                ▼
- [ React Bento Grid Matrix ]
+ [ React / Modern Web Matrix ]
 - Radial Score Gauges
 - Slide-Over Candidate Drawer
 ```
@@ -83,7 +89,7 @@ User uploads Resume (.pdf / .docx)
 - **Package Manager**: UV / Pip
 
 ### Frontend
-- **Framework**: React 19 + Vite
+- **Framework**: React 19 + Vite (also includes standalone FastAPI-served static studio)
 - **Styling**: Vanilla CSS (Tokens, CSS Grid, Glassmorphism, Micro-animations)
 - **Architecture**: Modular Components (`JobCriteriaStudio`, `ResumeVault`, `BentoMatrix`, `CandidateInspector`)
 
@@ -93,8 +99,8 @@ User uploads Resume (.pdf / .docx)
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/resume-analyzer.git
-cd resume-analyzer
+git clone https://github.com/adityakr0660/resumeintel.git
+cd resumeintel
 ```
 
 ### 2. Configure Environment Variables
@@ -111,29 +117,27 @@ GROQ_API_KEY=gsk_your_actual_groq_api_key_here
 
 ---
 
-### 3. Backend Setup (FastAPI)
+### 3. Backend Setup
 ```bash
-# Create virtual environment
+# Create and activate virtual environment
 python -m venv .venv
 
-# Activate virtual environment
 # On Windows:
 .venv\Scripts\activate
 # On macOS/Linux:
 source .venv/bin/activate
 
 # Install dependencies
-pip install fastapi uvicorn groq pydantic python-dotenv pypdf python-docx python-multipart
+pip install -r requirements.txt
 
-# Start the backend server
-python app.py
+# Start the server
+uvicorn app:app --reload --port 8000
 ```
-> The API server will be live at `http://127.0.0.1:8000`
+> The API server and interactive UI will be live at `http://127.0.0.1:8000`
 
 ---
 
-### 4. Frontend Setup (React + Vite)
-Open a new terminal:
+### 4. Optional: React Frontend Setup
 ```bash
 cd frontend
 
@@ -143,7 +147,7 @@ npm install
 # Start development server
 npm run dev
 ```
-> The React frontend will be live at `http://127.0.0.1:5173`
+> The React dev server will run at `http://127.0.0.1:5173`
 
 ---
 
@@ -158,18 +162,22 @@ npm run dev
 | `DELETE` | `/api/resumes/{filename}` | Delete a resume file and clear its cache |
 | `GET` | `/api/results` | Fetch all evaluated candidates sorted by score |
 | `POST` | `/api/analyze` | Trigger batch analysis across vault resumes |
-| `GET` | `/api/demo-data` | Fallback sample candidate evaluations for preview |
+| `GET` | `/api/demo-data` | Sample candidate evaluations for demo mode |
+| `POST` | `/api/reset` | Wipe all cache, uploaded resumes, and criteria |
 
 ---
 
-## 🎯 Key Interview Discussion Points
+## 💡 Key Engineering Decisions & Trade-offs
 
 1. **Why FastAPI over Flask or Django?**
-   - Native `async/await` handling makes it ideal for I/O-bound LLM API calls.
-   - Built-in Pydantic integration ensures request/response schema validation out of the box.
+   - Native `async/await` handling makes it ideal for I/O-bound LLM API calls with zero thread blocking.
+   - Built-in Pydantic integration ensures strict request/response schema validation and type safety out of the box.
 
-2. **How is Hallucination Prevented?**
-   - Using Groq's `response_format={"type": "json_object"}` coupled with strict Pydantic schemas forces the model to adhere to defined fields (`score`, `matching_skills`, `missing_important_skills`).
+2. **Zero-Hallucination Strategy (Structured LLM Outputs)**
+   - Used Groq's `response_format={"type": "json_object"}` coupled with strict Pydantic v2 schemas. This forces the LLM to output deterministic, strongly-typed JSON rather than verbose prose.
 
-3. **How is API Cost and Latency Optimized?**
-   - Implemented persistent disk caching (`analysis_cache.json`). Resumes that have already been evaluated are returned instantly without invoking additional LLM inference.
+3. **Cost & Latency Optimization**
+   - Implemented in-memory and persistent disk caching. Repeated resume evaluations return in $< 10\text{ms}$ without wasting LLM inference tokens.
+
+4. **Multi-Format Document Parsing Resilience**
+   - Abstracted `.pdf` (PyPDF) and `.docx` (Python-Docx) stream parsing to extract clean raw text while handling formatting inconsistencies and corrupted files gracefully.
