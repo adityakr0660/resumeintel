@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background subtle radial glow (optional aesthetic) -->
+    <linearGradient id="grad-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f3b74" />
+      <stop offset="50%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <linearGradient id="grad-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c2d57" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+
+    <!-- Drop Shadow for clean layering -->
+    <filter id="shadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#0c2d57" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Circular Dynamic Ring -->
+  <path d="M 120 370 A 180 180 0 1 0 380 110" 
+        fill="none" 
+        stroke="url(#grad-accent)" 
+        stroke-width="14" 
+        stroke-linecap="round" />
+
+  <path d="M 100 350 A 180 180 0 0 1 125 140" 
+        fill="none" 
+        stroke="#0c2d57" 
+        stroke-width="14" 
+        stroke-linecap="round" />
+
+  <!-- Document Back Shadow/Layer -->
+  <rect x="180" y="145" width="145" height="190" rx="10" 
+        transform="rotate(-12 180 145)" 
+        fill="none" 
+        stroke="#0c2d57" 
+        stroke-width="8" 
+        stroke-linejoin="round" />
+
+  <!-- Main Document (White fill + Crisp Border) -->
+  <g transform="rotate(-4 200 135)" filter="url(#shadow)">
+    <rect x="195" y="130" width="145" height="195" rx="10" 
+          fill="#ffffff" 
+          stroke="#0284c7" 
+          stroke-width="8" 
+          stroke-linejoin="round" />
+
+    <!-- Resume Content Elements -->
+    <!-- Profile Avatar placeholder -->
+    <circle cx="230" cy="165" r="14" fill="none" stroke="#0c2d57" stroke-width="5" />
+    <path d="M 216 193 C 216 182 244 182 244 193" fill="none" stroke="#0c2d57" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Profile Header Bars -->
+    <line x1="256" y1="165" x2="315" y2="165" stroke="#0c2d57" stroke-width="6" stroke-linecap="round" />
+    <line x1="256" y1="180" x2="295" y2="180" stroke="#0284c7" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Divider Line -->
+    <line x1="215" y1="208" x2="320" y2="208" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Text Rows / Skill Metrics -->
+    <circle cx="222" cy="230" r="4" fill="#0284c7" />
+    <line x1="236" y1="230" x2="310" y2="230" stroke="#0c2d57" stroke-width="5" stroke-linecap="round" />
+
+    <circle cx="222" cy="252" r="4" fill="#0284c7" />
+    <line x1="236" y1="252" x2="285" y2="252" stroke="#0c2d57" stroke-width="5" stroke-linecap="round" />
+
+    <circle cx="222" cy="274" r="4" fill="#0284c7" />
+    <line x1="236" y1="274" x2="300" y2="274" stroke="#0c2d57" stroke-width="5" stroke-linecap="round" />
+
+    <circle cx="222" cy="296" r="4" fill="#0284c7" />
+    <line x1="236" y1="296" x2="270" y2="296" stroke="#0c2d57" stroke-width="5" stroke-linecap="round" />
+  </g>
+
+  <!-- Magnifying Glass / Analysis Chart Assembly -->
+  <g filter="url(#shadow)">
+    <!-- Lens Body -->
+    <circle cx="295" cy="265" r="60" fill="#ffffff" stroke="url(#grad-accent)" stroke-width="12" />
+
+    <!-- Chart Bars inside Lens -->
+    <line x1="268" y1="295" x2="268" y2="270" stroke="#0c2d57" stroke-width="7" stroke-linecap="round" />
+    <line x1="285" y1="295" x2="285" y2="255" stroke="#0c2d57" stroke-width="7" stroke-linecap="round" />
+    <line x1="302" y1="295" x2="302" y2="240" stroke="#0c2d57" stroke-width="7" stroke-linecap="round" />
+    <line x1="319" y1="295" x2="319" y2="225" stroke="#0c2d57" stroke-width="7" stroke-linecap="round" />
+
+    <!-- Growth Trendline through Magnifier -->
+    <polyline points="255,275 285,250 305,260 365,170" 
+              fill="none" 
+              stroke="#00b4d8" 
+              stroke-width="8" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" />
+
+    <!-- Upward Arrow Head -->
+    <polygon points="350,165 375,155 375,182" fill="#00b4d8" />
+
+    <!-- Magnifier Handle -->
+    <line x1="340" y1="310" x2="385" y2="355" stroke="#0c2d57" stroke-width="16" stroke-linecap="round" />
+    <line x1="348" y1="318" x2="380" y2="350" stroke="#0284c7" stroke-width="8" stroke-linecap="round" />
+  </g>
+
+  <!-- Success / Star Accent -->
+  <path d="M 385 105 L 390 120 L 405 120 L 393 130 L 397 145 L 385 135 L 373 145 L 377 130 L 365 120 L 380 120 Z" 
+        fill="#00b4d8" />
+</svg>

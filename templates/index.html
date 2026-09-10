@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Intelligence Studio | AI Talent Screening</title>
+  <meta name="description" content="Precision resume screening and technical candidate evaluation powered by structured LLM intelligence.">
+  
+  <!-- Modern Typography: Outfit (Sans) and JetBrains Mono (Metrics) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Top Single-Line Navigation -->
+  <header class="app-header" id="main-nav">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <div class="brand-glyph">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <span class="brand-title">RESUME<span class="brand-accent">INTEL</span></span>
+        <span class="brand-badge">STUDIO</span>
+      </div>
+
+      <div class="nav-status">
+        <span class="status-indicator"></span>
+        <span class="status-text" id="active-role-pill">Target: Amazon SDE-I</span>
+      </div>
+
+      <div class="nav-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="nav-demo-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Demo Mode
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="nav-run-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+          </svg>
+          Run Analysis
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Asymmetric Split Hero Section -->
+    <section class="hero-section" id="hero-block">
+      <div class="hero-layout">
+        <div class="hero-content">
+          <div class="hero-eyebrow">TALENT INTELLIGENCE ENGINE</div>
+          <h1 class="hero-headline">Precision resume screening for engineering teams.</h1>
+          <p class="hero-subtext">
+            Evaluate technical resumes against your exact role criteria with explainable skill matching and scoring.
+          </p>
+          <div class="hero-actions">
+            <button type="button" class="btn btn-primary" id="hero-run-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Start Evaluation
+            </button>
+            <button type="button" class="btn btn-secondary" id="hero-upload-shortcut">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Upload Resumes
+            </button>
+          </div>
+          <div class="hero-metrics">
+            <span class="metric-item"><strong id="vault-count-stat">4</strong> Resumes in Vault</span>
+            <span class="metric-divider">/</span>
+            <span class="metric-item">Pydantic Validation</span>
+            <span class="metric-divider">/</span>
+            <span class="metric-item">Groq LLM Engine</span>
+          </div>
+        </div>
+
+        <div class="hero-asset-wrap">
+          <div class="hero-media-card">
+            <img src="/static/assets/hero_visual.jpg" alt="AI Talent Intelligence Graph" class="hero-media-img" width="720" height="405">
+            <div class="hero-media-overlay">
+              <div class="overlay-pill">
+                <span class="live-dot"></span>
+                <span>Structured Semantic Extraction</span>
+              </div>
+              <div class="overlay-badge">Ranked by Match %</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Studio Grid: Job Description Criteria & Resume Vault -->
+    <section class="studio-section" id="studio-block">
+      <div class="section-header">
+        <h2 class="section-title">Evaluation Setup</h2>
+        <p class="section-subtitle">Configure the target role specifications and manage candidate documents.</p>
+      </div>
+
+      <div class="studio-grid">
+        <!-- Panel 1: Target Role Criteria -->
+        <div class="studio-card jd-panel">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <h3 class="card-title" id="job-role-display">Role Criteria</h3>
+              <span class="badge" id="job-exp-display">Min Exp: 1.0 yr</span>
+            </div>
+            <button type="button" class="btn-text" id="toggle-jd-edit-btn">Edit Job Description</button>
+          </div>
+
+          <!-- Structured Criteria Tags -->
+          <div class="criteria-view" id="criteria-view">
+            <div class="criteria-group">
+              <div class="group-label">Required Skills</div>
+              <div class="tags-cluster" id="required-skills-tags">
+                <span class="tag tag-primary">Java</span>
+                <span class="tag tag-primary">Python</span>
+                <span class="tag tag-primary">C++</span>
+                <span class="tag tag-primary">Data Structures</span>
+                <span class="tag tag-primary">Algorithms</span>
+                <span class="tag tag-primary">Object-Oriented Design</span>
+              </div>
+            </div>
+
+            <div class="criteria-group">
+              <div class="group-label">Preferred Skills</div>
+              <div class="tags-cluster" id="preferred-skills-tags">
+                <span class="tag tag-muted">AWS</span>
+                <span class="tag tag-muted">Cloud Architecture</span>
+                <span class="tag tag-muted">Distributed Systems</span>
+                <span class="tag tag-muted">SQL/NoSQL</span>
+                <span class="tag tag-muted">GenAI Tools</span>
+                <span class="tag tag-muted">CI/CD</span>
+              </div>
+            </div>
+
+            <div class="criteria-group">
+              <div class="group-label">Education Requirements</div>
+              <ul class="criteria-list" id="education-requirements-list">
+                <li>Bachelor's degree in Computer Science or STEM</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Collapsible JD Textarea Editor -->
+          <div class="jd-editor-drawer hidden" id="jd-editor-drawer">
+            <label for="jd-textarea" class="editor-label">Paste or modify raw job description text:</label>
+            <textarea id="jd-textarea" class="jd-input" rows="8" placeholder="Paste target job description here..."></textarea>
+            <div class="editor-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="cancel-jd-btn">Cancel</button>
+              <button type="button" class="btn btn-primary btn-sm" id="save-jd-btn">Update & Re-Extract</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Resume Vault & Upload Dropzone -->
+        <div class="studio-card vault-panel">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <h3 class="card-title">Candidate Vault</h3>
+              <span class="badge" id="vault-badge-count">4 Resumes</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="vault-upload-btn">+ Upload</button>
+              <button type="button" class="btn-text" id="refresh-vault-btn">Refresh</button>
+            </div>
+          </div>
+
+          <!-- Hidden file input outside dropzone to eliminate bubbling issues -->
+          <input type="file" id="file-input" class="file-hidden-input" accept=".pdf,.docx" multiple style="display: none;">
+
+          <!-- Dropzone -->
+          <div class="dropzone" id="upload-dropzone" role="button" tabindex="0" style="cursor: pointer;">
+            <div class="dropzone-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div class="dropzone-prompt">
+              <strong>Click to browse files</strong> or drag & drop here
+            </div>
+            <div class="dropzone-hint">Supports PDF and DOCX up to 15MB (auto-evaluated upon upload)</div>
+          </div>
+
+          <!-- Vault Files List -->
+          <div class="vault-list" id="vault-files-list">
+            <!-- Populated via JS -->
+            <div class="vault-loading-skeleton">
+              <div class="skeleton-line w-75"></div>
+              <div class="skeleton-line w-50"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Candidate Evaluation Matrix (Bento Layout) -->
+    <section class="matrix-section" id="matrix-block">
+      <div class="section-header">
+        <div class="header-left">
+          <div class="hero-eyebrow">CANDIDATE RANKINGS</div>
+          <h2 class="section-title">Evaluation Matrix</h2>
+          <p class="section-subtitle">Candidates scored by qualification relevance, skill match, and experience verification.</p>
+        </div>
+        <div class="header-filters">
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="candidate-search-input" placeholder="Filter by candidate or skill...">
+          </div>
+          <div class="filter-pills" id="score-filters">
+            <button type="button" class="pill-btn active" data-filter="all">All</button>
+            <button type="button" class="pill-btn" data-filter="top">Top Match (80%+)</button>
+            <button type="button" class="pill-btn" data-filter="good">Good (70-79%)</button>
+            <button type="button" class="pill-btn" data-filter="review">Review (&lt;70%)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execution Progress Indicator -->
+      <div class="analysis-progress-panel hidden" id="analysis-progress-box">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="progress-status-row">
+          <span class="progress-label" id="progress-status-text">Processing candidate resumes with Groq LLM...</span>
+          <span class="progress-percent font-mono" id="progress-percent-text">0%</span>
+        </div>
+      </div>
+
+      <!-- Bento Cards Grid -->
+      <div class="bento-grid" id="bento-results-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Slide-Over Candidate Inspector Drawer -->
+  <div class="inspector-backdrop hidden" id="inspector-backdrop"></div>
+  <aside class="inspector-drawer hidden" id="inspector-drawer" aria-labelledby="drawer-candidate-name">
+    <div class="drawer-header">
+      <div class="drawer-header-info">
+        <span class="drawer-tag" id="drawer-rank-tag">RANK #1</span>
+        <h3 class="drawer-name" id="drawer-candidate-name">Candidate Name</h3>
+        <p class="drawer-file font-mono" id="drawer-filename">filename.pdf</p>
+      </div>
+      <button type="button" class="drawer-close-btn" id="drawer-close-btn" aria-label="Close Inspector">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Score & Summary Card -->
+      <div class="inspector-score-card">
+        <div class="score-circle-lg">
+          <svg class="radial-chart" viewBox="0 0 100 100">
+            <circle class="circle-bg" cx="50" cy="50" r="42" stroke-width="7"></circle>
+            <circle class="circle-progress" id="drawer-radial-progress" cx="50" cy="50" r="42" stroke-width="7" stroke-dasharray="264" stroke-dashoffset="35"></circle>
+          </svg>
+          <div class="score-text-wrap">
+            <span class="score-val font-mono" id="drawer-score-val">88.5</span>
+            <span class="score-pct font-mono">%</span>
+          </div>
+        </div>
+        <div class="score-summary-wrap">
+          <div class="verdict-label">RECRUITER VERDICT</div>
+          <p class="verdict-text" id="drawer-verdict-text">Strong candidate with solid foundations in algorithms and microservices.</p>
+          <div class="exp-check-row">
+            <span class="exp-badge" id="drawer-exp-badge">Experience Requirement Met</span>
+            <span class="exp-years font-mono" id="drawer-exp-years">1.5 Yrs Exp</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Metadata -->
+      <div class="inspector-meta-row">
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span id="drawer-email">email@example.com</span>
+        </div>
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          <span id="drawer-phone">+91 98765 43210</span>
+        </div>
+      </div>
+
+      <!-- Skills Deep Dive -->
+      <div class="inspector-section">
+        <h4 class="inspector-section-title">Matching Skills</h4>
+        <div class="tags-cluster" id="drawer-matching-skills">
+          <!-- Tags -->
+        </div>
+      </div>
+
+      <div class="inspector-section">
+        <h4 class="inspector-section-title">Missing / Growth Skills</h4>
+        <div class="tags-cluster" id="drawer-missing-skills">
+          <!-- Tags -->
+        </div>
+      </div>
+
+      <!-- Work Experience Timeline -->
+      <div class="inspector-section">
+        <h4 class="inspector-section-title">Extracted Experience</h4>
+        <div class="timeline-list" id="drawer-experience-list">
+          <!-- Timeline Items -->
+        </div>
+      </div>
+
+      <!-- Education & Projects -->
+      <div class="inspector-section">
+        <h4 class="inspector-section-title">Education</h4>
+        <ul class="bullet-list" id="drawer-education-list"></ul>
+      </div>
+
+      <div class="inspector-section">
+        <h4 class="inspector-section-title">Key Projects</h4>
+        <ul class="bullet-list" id="drawer-projects-list"></ul>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast Container -->
+  <div class="toast-stack" id="toast-stack"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
